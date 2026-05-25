@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Challenge - IES La Fresneda</title>
+
+<style>
+body{
+    font-family:Arial, sans-serif;
+    margin:0;
+    padding:0;
+    background:linear-gradient(135deg,#0f172a,#1e293b,#2563eb);
+    color:white;
+    text-align:center;
+}
+
+.screen{
+    display:none;
+    padding:30px;
+    min-height:100vh;
+}
+
+.active{
+    display:block;
+}
+
+h1{
+    font-size:3em;
+    margin-top:20px;
+}
+
+h2{
+    color:#93c5fd;
+}
+
+button{
+    padding:15px 25px;
+    margin:10px;
+    border:none;
+    border-radius:12px;
+    font-size:1em;
+    cursor:pointer;
+    background:#38bdf8;
+    color:white;
+    transition:0.3s;
+}
+
+button:hover{
+    background:#0ea5e9;
+    transform:scale(1.05);
+}
+
+.card{
+    background:rgba(255,255,255,0.1);
+    padding:20px;
+    border-radius:20px;
+    max-width:700px;
+    margin:auto;
+    backdrop-filter:blur(8px);
+}
+
+.question{
+    font-size:1.4em;
+    margin:20px;
+}
+
+img{
+    width:200px;
+    border-radius:20px;
+    margin-top:20px;
+}
+
+#score{
+    font-size:1.5em;
+    margin-top:20px;
+    color:#facc15;
+}
+</style>
+</head>
+
+<body>
+
+<!-- PANTALLA INICIAL -->
+<div class="screen active" id="startScreen">
+
+<h1>🎮 DIGITAL CHALLENGE</h1>
+
+<div class="card">
+
+<h2>IES LA FRESNEDA</h2>
+
+<p><b>Materia:</b> Digitalización - 1º Bachillerato</p>
+
+<p><b>Fecha:</b> <span id="fecha"></span></p>
+
+<img src="https://cdn.pixabay.com/photo/2016/11/19/14/00/code-1839406_1280.jpg">
+
+<p>
+Pon a prueba tus conocimientos sobre digitalización, tecnología,
+internet, inteligencia artificial y herramientas digitales.
+Responde preguntas y consigue la máxima puntuación.
+</p>
+
+<h2>Selecciona dificultad</h2>
+
+<button onclick="startGame('facil')">12 - 14 años</button>
+<button onclick="startGame('medio')">14 - 16 años</button>
+<button onclick="startGame('dificil')">16 - 18 años</button>
+
+</div>
+</div>
+
+<!-- PANTALLA DEL JUEGO -->
+<div class="screen" id="gameScreen">
+
+<h2 id="levelTitle"></h2>
+
+<div class="card">
+<div class="question" id="question"></div>
+
+<div id="answers"></div>
+
+<div id="score"></div>
+</div>
+
+</div>
+
+<script>
+
+document.getElementById("fecha").innerHTML =
+new Date().toLocaleDateString();
+
+const questions = {
+
+    facil: [
+
+        {
+            q:"¿Qué sistema operativo usa la mayoría de móviles Android?",
+            a:["Windows","Android","Linux","Canva"],
+            c:1
+        },
+
+        {
+            q:"¿Qué herramienta sirve para crear diseños online?",
+            a:["Excel","Canva","Word","Teams"],
+            c:1
+        },
+
+        {
+            q:"¿Qué aplicación sirve para videollamadas y clases online?",
+            a:["Teams","Paint","Tinkercad","HTML"],
+            c:0
+        },
+
+        {
+            q:"¿Dónde se guardan archivos online?",
+            a:["RAM","Nube","CPU","HTML"],
+            c:1
+        },
+
+        {
+            q:"¿Qué programa se usa para hacer documentos?",
+            a:["Word","Forms","Canva","Chrome"],
+            c:0
+        }
+
+    ],
+
+    medio:[
+
+        {
+            q:"¿Qué lenguaje se utiliza para crear páginas web?",
+            a:["Python","HTML","Excel","Windows"],
+            c:1
+        },
+
+        {
+            q:"¿Qué herramienta permite crear formularios online?",
+            a:["Word","Forms","Canva","Linux"],
+            c:1
+        },
+
+        {
+            q:"¿Qué plataforma usan muchos centros educativos?",
+            a:["Spotify","Moodle","TikTok","Netflix"],
+            c:1
+        },
+
+        {
+            q:"¿Qué programa sirve para hojas de cálculo?",
+            a:["Word","Canva","Excel","Teams"],
+            c:2
+        },
+
+        {
+            q:"¿Qué es la ciberseguridad?",
+            a:["Diseñar logos","Proteger datos y dispositivos","Crear vídeos","Editar fotos"],
+            c:1
+        }
+
+    ],
+
+    dificil:[
+
+        {
+            q:"¿Qué significa IA?",
+            a:["Internet Automático","Inteligencia Artificial","Imagen Avanzada","Interfaz Analógica"],
+            c:1
+        },
+
+        {
+            q:"¿Qué plataforma de Microsoft incluye Word y Excel online?",
+            a:["Linux","Microsoft 365","Canva","HTML"],
+            c:1
+        },
+
+        {
+            q:"¿Qué herramienta permite crear modelos 3D?",
+            a:["Teams","Tinkercad","Forms","Word"],
+            c:1
+        },
+
+        {
+            q:"¿Qué tipo de red conecta dispositivos cercanos?",
+            a:["LAN","CPU","HTML","SSD"],
+            c:0
+        },
+
+        {
+            q:"¿Qué lenguaje puede combinarse con CSS y JavaScript para diseño web?",
+            a:["Excel","HTML","Word","Moodle"],
+            c:0
+        }
+
+    ]
+
+};
+
+let currentQuestions = [];
+let currentQuestion = 0;
+let score = 0;
+
+function startGame(level){
+
+    document.getElementById("startScreen").classList.remove("active");
+    document.getElementById("gameScreen").classList.add("active");
+
+    document.getElementById("levelTitle").innerHTML =
+    "Dificultad: " + level.toUpperCase();
+
+    currentQuestions = questions[level];
+    currentQuestion = 0;
+    score = 0;
+
+    showQuestion();
+}
+
+function showQuestion(){
+
+    if(currentQuestion >= currentQuestions.length){
+
+        document.getElementById("question").innerHTML =
+        "🎉 Juego terminado";
+
+        document.getElementById("answers").innerHTML =
+        "<h2>Puntuación final: " + score + "/" + currentQuestions.length + "</h2><button onclick='location.reload()'>Volver a jugar</button>";
+
+        return;
+    }
+
+    let q = currentQuestions[currentQuestion];
+
+    document.getElementById("question").innerHTML = q.q;
+
+    let answersHTML = "";
+
+    q.a.forEach((answer,index)=>{
+
+        answersHTML += `
+        <button onclick="checkAnswer(${index})">
+        ${answer}
+        </button><br>
+        `;
+
+    });
+
+    document.getElementById("answers").innerHTML = answersHTML;
+
+    document.getElementById("score").innerHTML =
+    "⭐ Puntos: " + score;
+}
+
+function checkAnswer(index){
+
+    if(index === currentQuestions[currentQuestion].c){
+        score++;
+    }
+
+    currentQuestion++;
+    showQuestion();
+}
+
+</script>
+
+</body>
+</html>
+    }
+}
+    })
+    }
+}
+}
+        }
+        }
+        }
+        }
+        }
+    ]
+        }
+        }
+        }
+        }
+        }
+    ]
+        }
+        }
+        }
+        }
+        }
+    ]
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
